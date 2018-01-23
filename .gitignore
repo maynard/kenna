@@ -7,7 +7,7 @@
 /spec/reports/
 /tmp/
 examples.rb
-
+bin
 
 # rspec failure tracking
 .rspec_status
