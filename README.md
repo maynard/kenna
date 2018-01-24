@@ -19,22 +19,42 @@ Or install it yourself as:
 
 ## Usage
 
-# Get an Api Instance
+Get an Api Instance
 
-# Test token ty9hxcpmgdrvnuqe
-# @api = Kenna::Api.new("your_token")
+Test token ty9hxcpmgdrvnuqe
+@api = Kenna::Api.new("your_token")
 
-# Test token ty9hxcpmgdrvnuqe
+Test token ty9hxcpmgdrvnuqe
 @api = Kenna::Api.new("ty9hxcpmgdrvnuqe")
 
-# Get All Users (only up to 500)
+There are basic crud methods that return a Response Object, 
+    use .body to get the JSON 
+    use .code to get the response code
+    use .headers to get the headers
+    'resource' is the root name of the endpoint, such as 'users'
+TODO: Several methods are responding only with body and need to be refactored
+TODO: Address throttling issues
+
+@api.post(uri, body)
+@api.postByResource(resource, body)
+@api.get(uri)
+@api.getById(resource, id)
+@api.update(uri, body)
+@api.updateById(resource, id, body)
+@api.delete(uri)
+@api.deleteById(resource, id)
+
+The following are two examples of shortcut methods,
+I intend to provide these for all routes
+
+Get All Users (only up to 500 for now)
 @users = @api.getAllUsers()
 puts @users
 
-# Getting the first User ID (there should always be at least one)
+Getting the first User ID (there should always be at least one)
 @user_id = @users[0]['id']
 
-# Get A Single User by ID
+Get A Single User by ID
 @user = @api.getUserById(@user_id)
 puts @user
 
