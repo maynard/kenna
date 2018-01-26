@@ -4,7 +4,7 @@
 # License:: Ruby license.
 
 require 'json'
-require 'kenna/version'
+#require 'kenna/version'
 require 'rest-client'
 require 'faker'
 
@@ -38,8 +38,17 @@ module Kenna
     def post(uri, body)
       body = body.to_json
       @url = $base_url + uri
+      
+      
       @response = RestClient.post(@url, body, headers={'X-Risk-Token' => $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json'})
-      JSON.parse(@response.body)
+      
+    rescue StandardError => e 
+      @return = {}
+      #@return['body'] = nil
+      @return['http_code'] = e.http_code
+      @return['message'] = e.message
+      @return.to_json
+    #ensure
     end
     
     def postByResource(resource, body)
@@ -109,8 +118,8 @@ module Kenna
       @fake_user = {
                       "user":
                         {
-                          "firstname": Faker::Name.first_name ,
-                          "lastname": Faker::Name.last_name ,
+                          "firstname": Faker::Name.first_name,
+                          "lastname": Faker::Name.last_name,
                           "email": Faker::Internet.email,
                           "role": @role
                         }
@@ -119,7 +128,8 @@ module Kenna
       
     # Pretty version for API Browser
     def fakeUserPretty
-      JSON.pretty_generate JSON.parse(fakeUser)
+      @fup = JSON.pretty_generate JSON.parse(fakeUser)
+      @fup.to_s
     end
     
   end
@@ -131,52 +141,66 @@ end
 # TODO (Maynard Black): Finish tests!
 # TODO (Maynard Black): The sample account Token will need to change! This is my free temp one
 
-# @api = Kenna::Api.new("ty9hxcpmgdrvnuqe")
+#$api = Kenna::Api.new("ty9hxcpmgdrvnuqe")
 
-# @new_user = @api.post('/users', @api.fakeUser)
-# @id = @new_user["user"]["id"]
-# puts @id
+@b = {"user":{"firstname":"Izabella","lastname":"Lowe","email":"cristobal.rutherford@fadelanderson.biz","phone":"(488) 202-7225","role":"normal user"}}
+#puts @b
+#puts '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
+#puts $api.fakeUser
+#puts '**************************************************'
 
-# @new_user = @api.postByResource('users', @api.fakeUser)
-# @id2 = @new_user["user"]["id"]
-# puts @id2
+#@new_user = $api.post('/users', @b)
+
+ #@new_user = JSON.parse(@new_user);
+ #$id = @new_user["user"]["id"]
+ #puts $id
+
+#@new_user = $api.post('/users', $api.fakeUser) 
+#@new_user = JSON.parse(@new_user)
+#if !@new_user['body']
+#  puts @new_user
+#else
+#  puts @new_user['body']
+#end
+
+# @new_user = $api.postByResource('users', $api.fakeUser)
+# $id2 = @new_user["user"]["id"]
+# puts $id2
 
 # TODO (Maynard Black): Address throttling issues
 
 # @b = {"firstname":"JOE"}
-# @u = @api.update('/users/' + @id.to_s, @b)
+# @u = $api.update('/users/' + $id.to_s, @b)
 # puts @u.code
 # puts JSON.parse(@u.body)["user"]["firstname"]
 
-# @data = @api.getById('users', 35665)
+# @data = $api.getById('users', 35665)
 # puts @data['user']['id']
 
 # User Methods
-# @users = @api.getAllUsers()
+# @users = $api.getAllUsers()
 # puts @users
  
 # @users = JSON.parse(@users)
 # puts @users[@users.keys[0]]
  
 # @user_id = @users[0]['id']
-# @user = @api.getUserById(@user_id)
+# @user = $api.getUserById(@user_id)
 # puts @user['id'] == 35665
 
-# @id = 35992
+# $id = 35992
 # @body = {"firstname":"KERMIT"}
-# @api.update('/users/' + @id.to_s, @body)
+# $api.update('/users/' + $id.to_s, @body)
 
-# @new_user = @api.get('/users/' + @id.to_s)
+# @new_user = $api.get('/users/' + $id.to_s)
 # @new_name = @new_user["user"]["firstname"]
 # puts @new_user
 # puts @new_name
 
-# @id = @api.getAllUsers()[9]["id"]
-# puts @id
+# $id = $api.getAllUsers()[9]["id"]
+# puts $id
 
-# @delete = @api.delete('/users/' + @id.to_s)
+# @delete = $api.delete('/users/' + $id.to_s)
 #puts @delete.code != 200
 
-# @user = @api.get('/users/' + @id.to_s)
-# puts @user.class == 'RestClient::Response'
-# puts @user.code != 200
+# @user = $api.get('/users/' + $id.to_s)
