@@ -15,39 +15,31 @@ class TestUsers < Test::Unit::TestCase
         assert_not_nil(@new_user, "post(uri, body) Failed")
     end
     
-    #def test_post_by_resource
-    #    @new_user2 = $api.postByResource('users', $api.fakeUser)
-    #    @id2 = @new_user2["user"]["id"]
-    #    assert_not_nil(@new_user2, "post(resource, body) Failed")
-    #end
-    
     ################################### GET ##########################################
     
-    def test_get_from_uri
+    def test_get
         @data = $api.get('/users')
         $id = @data["users"][0]['id']
         assert_not_nil(@data["users"], "get(uri) Failed")
     end
     
-    def test_get_a_single_resource_by_id
-        @data = $api.getById('users', 35665)
-        @data = JSON.parse(@data.body)
-        assert_equal(35665, @data['user']['id'], "getById(resource, id) Failed")
-    end
-    
     ################################### PUT ##########################################
     
+    def test_put
+        $id = 35665
+        @b = {"user":{"firstname":"Maynard"}}
+        @api_response = $api.put('/users/' + $id.to_s, @b)
+        assert_equal(@api_response.class, RestClient::Response, "get(uri) Failed")
+    end
     
     ################################### DELETE ##########################################
     
-    #def test_delete_by_uri
-    #    @data = $api.delete('/users/' + $id)
-    #    assert_equal(@data.code, 200, "delete(uri) Failed")
-    #end
+    def test_delete
+        $id = $api.getAllUsers()
+        sleep(0.1) # it looks like if there are a lot of records you can't get one by index until the query is done. IDK. Need to learn more.
+        $id = $id[9]['id']
+        @delete = $api.delete('/users/' + $id.to_s)
+        assert_equal(@delete.code, 204, "delete(uri) Failed")
+    end
     
-    #def test_delete_by_id
-    #    @data = $api.deleteById('users', $id2)
-    #    assert_equal(@data.code, 200, "deleteById(resource, id) Failed")
-    #end
-
 end

@@ -14,6 +14,9 @@ module Kenna
     # Must have a token to continue
     def initialize(token)
       $token = token
+      
+      # Slow it down 500ms due to throttling
+      sleep(0.5)
     end
     
     # TODO (Maynard Black): ask Kenna about API versioning
@@ -29,17 +32,16 @@ module Kenna
     # TODO (Important - Maynard Black): Refactor to return the whole response including headers
     #        This means updating the tests first! Then the API Browser App!
     #        I am currently only returning a JSON parsed body so there is no way to catch 404s and such
-    # UPDATE: the 2 get,delete and uppdate methods have been refactored as per above
+    #        UPDATE: DONE
     # TODO (Maynard Black): Refactor the 2 post, put, getAllUsers, getUserById methods to return headers
     # TODO (Maynard Black): Catch exceptions when hitting server, that is the only way to 
     #       catch certain response codes (like 404) with the client I am using
     
-    # Create
+    #################### Post #################### 
+    
     def post(uri, body)
       body = body.to_json
       @url = $base_url + uri
-      
-      
       @response = RestClient.post(@url, body, headers={'X-Risk-Token' => $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json'})
       
     rescue StandardError => e 
@@ -51,53 +53,42 @@ module Kenna
     #ensure
     end
     
-    def postByResource(resource, body)
-      body = body.to_json
-      @url = $base_url +'/'+ resource
-      @response = RestClient.post(@url, body, headers={'X-Risk-Token' => $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json'})
-      JSON.parse(@response.body)
-    end
     
-    # Read
+    #################### Get ####################
     def get(uri)
       @url = $base_url + uri
       @response = RestClient.get(@url, headers={'X-Risk-Token' => $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json'})
     end
     
-    def getById(resource, id)
-      @url = $base_url +'/'+ resource +'/'+ id.to_s
-      RestClient.get(@url, headers={'X-Risk-Token' => $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json'})
-    end
-    
-    # Update
-    def update(uri, body)
+    #################### Put ####################
+    def put(uri, body)
       body = body.to_json
       @url = $base_url + uri
       @response = RestClient.put(@url, body, headers={'X-Risk-Token' => $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json'})
+      
+    rescue StandardError => e 
+      @return = {}
+      @return['http_code'] = e.http_code
+      @return['message'] = e.message
+      @return.to_json
+    #ensure
     end
     
-    def updateById(resource, id, body)
-      body = body.to_json
-      @url = $base_url +'/'+ resource +'/' + id.to_s
-      @response = RestClient.put(@url, body, headers={'X-Risk-Token' => $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json'})
-    end
-    
-    # Delete
+
+    #################### Delete ####################
     def delete(uri)
       @url = $base_url + uri
       @response = RestClient.delete(@url, headers={'X-Risk-Token' => $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json'})
     end
     
-    def deleteById(resource, id)
-      @url = $base_url +'/'+ resource +'/' + id.to_s
-      @response = RestClient.delete(@url, headers={'X-Risk-Token' => $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json'})
-    end
 
-    # User specific methods 
+    #################### User Specific Methods ####################
+    
     # TODO (Maynard Black): Finish all User options
     # TODO (Maynard Black): Do this for all other endpoints
     # TODO (Maynard Black): Some endpoint calls will require an array of id's, the app can fill
     #       in the rest
+    
     def getAllUsers()
       @url = $base_url + '/users'
       @response = RestClient.get(@url, headers={'X-Risk-Token' => $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json'})
@@ -110,8 +101,8 @@ module Kenna
       JSON.parse(@response.body)["user"]
     end
     
-    # Generate a unique fake user for testing 
-    # and for the API browser
+    #################### Generate a unique fake user for testing ####################
+    
     def fakeUser
       @roles = ['administrator', 'normal user', 'Linux Test Environment']
       @role = @roles[rand(0..2)]
@@ -126,12 +117,13 @@ module Kenna
                     }
     end
       
-    # Pretty version for API Browser
+    #################### Pretty version for API Browser ####################
     def fakeUserPretty
       @fup = JSON.pretty_generate JSON.parse(fakeUser)
       @fup.to_s
     end
     
+    ########################################################################
   end
 end
 
@@ -158,10 +150,11 @@ $api = Kenna::Api.new("ty9hxcpmgdrvnuqe")
 
 # @new_user = $api.post('/users', $api.fakeUser) 
 # @new_user = JSON.parse(@new_user)
-# if !@new_user['body']
+# if @new_user['message']
+#   puts '*ERROR* *ERROR* *ERROR* *ERROR* *ERROR* *ERROR* '
 #   puts @new_user
 # else
-#   puts @new_user['body']
+#   puts @new_user['user']['id']
 # end
 
 # @new_user = $api.postByResource('users', $api.fakeUser)
@@ -187,26 +180,34 @@ $api = Kenna::Api.new("ty9hxcpmgdrvnuqe")
 
 ################################### PUT ########################################
 
-# @b = {"firstname":"JOE"}
-# @u = $api.update('/users/' + $id.to_s, @b)
-# puts @u.code
-# puts JSON.parse(@u.body)["user"]["firstname"]
+# $id = 35665
+# @b = {"user":{"firstname":"Maynard"}}
+# @api_response = $api.put('/users/' + $id.to_s, @b)
 
-# $id = 35992
+# if @api_response.class != RestClient::Response
+#   puts @api_response
+# else
+#   @get_api_response = $api.get('/users/' + $id.to_s)
+#   puts @get_api_response
+# end
+
+ 
 # @body = {"firstname":"KERMIT"}
-# $api.update('/users/' + $id.to_s, @body)
+# $api.put('/users/' + $id.to_s, @body)
 
 
 ################################### DELETE #####################################
 
-# $id = $api.getAllUsers()[9]["id"]
-# puts $id
+# $id = $api.getAllUsers()
+# sleep(0.1) # it looks like if there are a lot of records you can't get one by index until the query is done. IDK. Need to learn more.
+# $id = $id[9]['id']
 
 # @delete = $api.delete('/users/' + $id.to_s)
-# puts @delete.code != 200
+# puts @delete.code
 
+# $id = 35940
 # @user = $api.get('/users/' + $id.to_s)
-
+# puts @user
 ################################### Custom - /user #############################
 
 # @users = JSON.parse(@users)
