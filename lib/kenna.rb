@@ -66,7 +66,7 @@ module Kenna
     
     def getById(resource, id)
       @url = $base_url +'/'+ resource +'/'+ id.to_s
-      @response = RestClient.get(@url, headers={'X-Risk-Token' => $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json'})
+      RestClient.get(@url, headers={'X-Risk-Token' => $token, 'Content-Type' => 'application/json', 'Accept' => 'application/json'})
     end
     
     # Update
@@ -136,71 +136,82 @@ module Kenna
 end
 
 # BASIC MANUAL TESTS 
-# There are actual tests for some things (Written first believe it or not!)
+# There are actual tests (in /test - run 'rake') for some things (Written first believe it or not!)
 # But I wrote these local test to get a better idea of what was happening 
 # TODO (Maynard Black): Finish tests!
 # TODO (Maynard Black): The sample account Token will need to change! This is my free temp one
+# TODO (Maynard Black): Address throttling issues
 
-#$api = Kenna::Api.new("ty9hxcpmgdrvnuqe")
 
-@b = {"user":{"firstname":"Izabella","lastname":"Lowe","email":"cristobal.rutherford@fadelanderson.biz","phone":"(488) 202-7225","role":"normal user"}}
-#puts @b
-#puts '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
-#puts $api.fakeUser
-#puts '**************************************************'
+$api = Kenna::Api.new("ty9hxcpmgdrvnuqe")
 
-#@new_user = $api.post('/users', @b)
+################################### POST ##########################################
 
- #@new_user = JSON.parse(@new_user);
- #$id = @new_user["user"]["id"]
- #puts $id
+# @b = {"user":{"firstname":"Izabella","lastname":"Lowe","email":"cristobal.rutherford@fadelanderson.biz","phone":"(488) 202-7225","role":"normal user"}}
+# puts @b
+# puts $api.fakeUser
+# @new_user = $api.post('/users', @b)
 
-#@new_user = $api.post('/users', $api.fakeUser) 
-#@new_user = JSON.parse(@new_user)
-#if !@new_user['body']
-#  puts @new_user
-#else
-#  puts @new_user['body']
-#end
+# @new_user = JSON.parse(@new_user);
+# $id = @new_user["user"]["id"]
+# puts $id
+
+# @new_user = $api.post('/users', $api.fakeUser) 
+# @new_user = JSON.parse(@new_user)
+# if !@new_user['body']
+#   puts @new_user
+# else
+#   puts @new_user['body']
+# end
 
 # @new_user = $api.postByResource('users', $api.fakeUser)
 # $id2 = @new_user["user"]["id"]
 # puts $id2
 
-# TODO (Maynard Black): Address throttling issues
+################################### GET ########################################
 
-# @b = {"firstname":"JOE"}
-# @u = $api.update('/users/' + $id.to_s, @b)
-# puts @u.code
-# puts JSON.parse(@u.body)["user"]["firstname"]
-
-# @data = $api.getById('users', 35665)
-# puts @data['user']['id']
-
-# User Methods
 # @users = $api.getAllUsers()
 # puts @users
- 
-# @users = JSON.parse(@users)
-# puts @users[@users.keys[0]]
- 
-# @user_id = @users[0]['id']
-# @user = $api.getUserById(@user_id)
-# puts @user['id'] == 35665
-
-# $id = 35992
-# @body = {"firstname":"KERMIT"}
-# $api.update('/users/' + $id.to_s, @body)
 
 # @new_user = $api.get('/users/' + $id.to_s)
 # @new_name = @new_user["user"]["firstname"]
 # puts @new_user
 # puts @new_name
 
+# @data = $api.getById('users', 35665)
+# puts @data.class
+
+# @data = $api.getById('users', 35665)
+# @data = JSON.parse(@data.body)
+# puts @data['user']['id']
+
+################################### PUT ########################################
+
+# @b = {"firstname":"JOE"}
+# @u = $api.update('/users/' + $id.to_s, @b)
+# puts @u.code
+# puts JSON.parse(@u.body)["user"]["firstname"]
+
+# $id = 35992
+# @body = {"firstname":"KERMIT"}
+# $api.update('/users/' + $id.to_s, @body)
+
+
+################################### DELETE #####################################
+
 # $id = $api.getAllUsers()[9]["id"]
 # puts $id
 
 # @delete = $api.delete('/users/' + $id.to_s)
-#puts @delete.code != 200
+# puts @delete.code != 200
 
 # @user = $api.get('/users/' + $id.to_s)
+
+################################### Custom - /user #############################
+
+# @users = JSON.parse(@users)
+# puts @users[@users.keys[0]]
+ 
+# @user_id = @users[0]['id']
+# @user = $api.getUserById(@user_id)
+# puts @user['id'] == 35665

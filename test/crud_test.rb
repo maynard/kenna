@@ -1,10 +1,13 @@
 require "test_helper"
 
 class TestUsers < Test::Unit::TestCase
-  
+    
+    # TODO (Maynard Black): Finish Tests!!
+    
     $api = Kenna::Api.new("ty9hxcpmgdrvnuqe")
     
-    # Create
+    ################################### POST ##########################################
+    
     def test_post
         @new_user = $api.post('/users', $api.fakeUser) 
         @new_user = JSON.parse(@new_user)
@@ -18,7 +21,8 @@ class TestUsers < Test::Unit::TestCase
     #    assert_not_nil(@new_user2, "post(resource, body) Failed")
     #end
     
-    # Read
+    ################################### GET ##########################################
+    
     def test_get_from_uri
         @data = $api.get('/users')
         $id = @data["users"][0]['id']
@@ -26,13 +30,16 @@ class TestUsers < Test::Unit::TestCase
     end
     
     def test_get_a_single_resource_by_id
-        @data = $api.getById('users', $id)
-        assert_not_nil(@data["user"]["id"], "getById(resource, id) Failed")
+        @data = $api.getById('users', 35665)
+        @data = JSON.parse(@data.body)
+        assert_equal(35665, @data['user']['id'], "getById(resource, id) Failed")
     end
     
-    # TODO (Maynard Black): Update Tests
-
-    # Delete
+    ################################### PUT ##########################################
+    
+    
+    ################################### DELETE ##########################################
+    
     #def test_delete_by_uri
     #    @data = $api.delete('/users/' + $id)
     #    assert_equal(@data.code, 200, "delete(uri) Failed")
