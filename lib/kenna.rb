@@ -4,7 +4,7 @@
 # License:: Ruby license.
 
 require 'json'
-#require 'kenna/version'
+require 'kenna/version'
 require 'rest-client'
 require 'faker'
 
